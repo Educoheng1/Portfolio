@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eduardo Cohen — Developer & Athlete</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8f9fb;
+    --card: #f1f3f7;
+    --border: #e2e6ed;
+    --accent: #0070f3;
+    --accent2: #7c3aed;
+    --accent3: #059669;
+    --text: #0f1117;
+    --muted: #6b7280;
+    --glow: 0 0 30px rgba(0,112,243,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed; pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: multiply;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(0,112,243,0.4);
+    border-radius: 50%;
+    position: fixed; pointer-events: none;
+    z-index: 9998;
+    transition: all 0.3s ease;
+    transform: translate(-12px,-12px);
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.2;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 4rem;
+    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.9);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-size: 1.1rem; font-weight: 800;
+    letter-spacing: 0.05em; color: var(--text);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 8rem 4rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,112,243,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,112,243,0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+  }
+
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: orb-float 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .orb-1 { width: 500px; height: 500px; background: rgba(0,112,243,0.06); top: -100px; right: -100px; }
+  .orb-2 { width: 400px; height: 400px; background: rgba(124,58,237,0.05); bottom: 0; left: -100px; animation-delay: -4s; }
+
+  @keyframes orb-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+  }
+
+  .hero-content { position: relative; max-width: 900px; }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .hero-tag::before {
+    content: ''; display: block; width: 32px; height: 1px; background: var(--accent);
+  }
+
+  .hero-name {
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 800; line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+  .hero-name .line-2 { color: transparent; -webkit-text-stroke: 1px rgba(15,17,23,0.15); }
+
+  .hero-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem; line-height: 1.7;
+    color: var(--muted); max-width: 560px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-desc strong { color: var(--text); }
+
+  .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3.5rem; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    background: var(--accent); color: #ffffff;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem; font-weight: 700;
+    letter-spacing: 0.05em; text-decoration: none;
+    transition: all 0.25s; position: relative; overflow: hidden;
+  }
+  .btn-primary::after {
+    content: ''; position: absolute; inset: 0;
+    background: white; opacity: 0; transition: opacity 0.2s;
+  }
+  .btn-primary:hover::after { opacity: 0.15; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,112,243,0.3); }
+
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    border: 1px solid var(--border); color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    letter-spacing: 0.05em; text-decoration: none;
+    transition: all 0.25s; background: transparent;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  .hero-stats {
+    display: flex; gap: 3rem; flex-wrap: wrap;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .stat-item .stat-num {
+    font-size: 2rem; font-weight: 800; color: var(--text);
+    line-height: 1;
+  }
+  .stat-item .stat-num span { color: var(--accent); }
+  .stat-item .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-top: 0.25rem;
+  }
+
+  /* SECTIONS */
+  section { padding: 6rem 4rem; position: relative; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .section-label::before { content: '//'; opacity: 0.5; }
+
+  .section-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800; letter-spacing: -0.02em;
+    margin-bottom: 3rem; line-height: 1.1;
+  }
+
+  /* ABOUT */
+  #about { background: var(--surface); }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4rem; align-items: start;
+  }
+  .about-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem; line-height: 1.9;
+    color: var(--muted);
+  }
+  .about-text p { margin-bottom: 1.25rem; }
+  .about-text strong { color: var(--text); }
+
+  .about-skills { }
+  .skill-category { margin-bottom: 2rem; }
+  .skill-cat-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.75rem;
+  }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .skill-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; padding: 0.35rem 0.75rem;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text); transition: all 0.2s;
+  }
+  .skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* PROJECTS */
+  #projects { }
+  .projects-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.5px; background: var(--border);
+  }
+  .project-card {
+    background: var(--surface);
+    padding: 2.5rem;
+    position: relative; overflow: hidden;
+    transition: all 0.3s;
+    display: flex; flex-direction: column;
+  }
+  .project-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .project-card:hover::before { transform: scaleX(1); }
+  .project-card:hover { background: var(--card); }
+
+  .project-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; color: var(--muted);
+    letter-spacing: 0.1em; margin-bottom: 1.5rem;
+  }
+  .project-name {
+    font-size: 1.35rem; font-weight: 700;
+    margin-bottom: 0.75rem; line-height: 1.2;
+  }
+  .project-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem; line-height: 1.8;
+    color: var(--muted); margin-bottom: 1.5rem; flex: 1;
+  }
+  .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+  .project-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; padding: 0.2rem 0.6rem;
+    border: 1px solid var(--border); color: var(--muted);
+  }
+  .project-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--accent); text-decoration: none;
+    transition: gap 0.2s; letter-spacing: 0.05em;
+  }
+  .project-link:hover { gap: 0.75rem; }
+
+  .project-stat {
+    font-size: 1.8rem; font-weight: 800;
+    color: var(--accent); margin-bottom: 0.1rem;
+  }
+
+  /* EXPERIENCE */
+  #experience { background: var(--surface); }
+  .timeline { position: relative; padding-left: 1.5rem; }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 1px; background: var(--border);
+  }
+  .timeline-item {
+    position: relative; padding: 0 0 3rem 2.5rem;
+  }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -4px; top: 6px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(0,112,243,0.4);
+  }
+  .timeline-period {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.5rem;
+  }
+  .timeline-role {
+    font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem;
+  }
+  .timeline-company {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem; color: var(--accent); margin-bottom: 1rem;
+  }
+  .timeline-points {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem; line-height: 1.8; color: var(--muted); list-style: none;
+  }
+  .timeline-points li { margin-bottom: 0.5rem; padding-left: 1rem; position: relative; }
+  .timeline-points li::before { content: '→'; position: absolute; left: 0; color: var(--accent3); }
+
+  /* ATHLETIC */
+  #athletic {
+    background: linear-gradient(135deg, #f0f4ff 0%, #f8f9fb 100%);
+    overflow: hidden; position: relative;
+  }
+  .athletic-banner {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent, transparent 40px,
+      rgba(0,112,243,0.03) 40px, rgba(0,112,243,0.03) 41px
+    );
+  }
+  .athletic-content { position: relative; }
+  .athletic-grid {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 4rem; align-items: center;
+  }
+  .big-number {
+    font-size: clamp(6rem, 14vw, 12rem);
+    font-weight: 800; line-height: 1;
+    color: transparent; -webkit-text-stroke: 1px rgba(0,112,243,0.2);
+    letter-spacing: -0.05em;
+  }
+  .athletic-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.88rem; line-height: 1.9;
+    color: var(--muted);
+  }
+  .athletic-achievement {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(0,112,243,0.06); border: 1px solid rgba(0,112,243,0.15);
+    padding: 0.6rem 1.2rem; margin: 0.35rem 0.35rem 0 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--text);
+  }
+  .achievement-icon { color: var(--accent); font-size: 0.9rem; }
+
+  /* CONTACT */
+  #contact { text-align: center; padding: 8rem 4rem; }
+  .contact-inner { max-width: 600px; margin: 0 auto; }
+  .contact-subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem; line-height: 1.8;
+    color: var(--muted); margin-bottom: 2.5rem;
+  }
+  .contact-links {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 4rem;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; color: var(--muted);
+  }
+
+  /* Animations */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 4rem 1.5rem; }
+    #hero { padding: 6rem 1.5rem 3rem; }
+    .about-grid, .projects-grid, .athletic-grid { grid-template-columns: 1fr; }
+    .big-number { font-size: 5rem; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">EC<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#athletic">Athletic</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-orb orb-1"></div>
+  <div class="hero-orb orb-2"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag reveal">Computer Science Senior · Tampa, FL</div>
+    <h1 class="hero-name reveal reveal-delay-1">
+      Eduardo<br>
+      <span class="line-2">Cohen</span>
+    </h1>
+    <p class="hero-desc reveal reveal-delay-2">
+      <strong>Full-stack developer & cybersecurity practitioner</strong> building production-grade systems. 
+      From real-time analytics platforms to AI models. Also NCAA #1 ranked doubles athlete.
+    </p>
+    <div class="hero-ctas reveal reveal-delay-3">
+      <a href="https://saint-leo-live-scores.onrender.com/" target="_blank" class="btn-primary">
+        ↗ Live Project
+      </a>
+      <a href="https://github.com/Educoheng1" target="_blank" class="btn-outline">
+        GitHub Profile
+      </a>
+      <a href="https://www.linkedin.com/in/educoheng/" target="_blank" class="btn-outline">
+        LinkedIn
+      </a>
+    </div>
+    <div class="hero-stats reveal">
+      <div class="stat-item">
+        <div class="stat-num">180<span>+</span></div>
+        <div class="stat-label">Platform Users</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">6.5<span>k</span></div>
+        <div class="stat-label">Tracked Events</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">3.5</div>
+        <div class="stat-label">GPA / 4.0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">#<span>1</span></div>
+        <div class="stat-label">NCAA Ranked</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">About</div>
+  <h2 class="section-title">Who I Am</h2>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <p>I'm a Computer Science senior at <strong>Saint Leo University</strong>, graduating May 2026. I build full-stack applications and AI systems — the kind that ship to real users and generate real data.</p>
+      <p>My current focus is on backend architecture and production deployments. My project <strong>LeoScore</strong> — a real-time tennis match tracker built with FastAPI, React, and Redis — serves 180+ users and has logged over 6,500 engagement events.</p>
+      <p>On the security side, I work with penetration testing tools including <strong>Nmap, Metasploit, and Wireshark</strong> within controlled lab environments. I understand systems from both the builder's and the attacker's perspective.</p>
+      <p>I speak <strong>4 languages</strong>: Hebrew (native), English, Spanish (fluent), and Portuguese (intermediate). I grew up between cultures, which taught me to adapt fast — a skill I carry into engineering.</p>
+    </div>
+    <div class="about-skills reveal reveal-delay-1">
+      <div class="skill-category">
+        <div class="skill-cat-name">Backend & Systems</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">FastAPI</span>
+          <span class="skill-tag">PostgreSQL</span>
+          <span class="skill-tag">Redis</span>
+          <span class="skill-tag">SQLite</span>
+          <span class="skill-tag">REST APIs</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-name">Frontend</div>
+        <div class="skill-tags">
+          <span class="skill-tag">React</span>
+          <span class="skill-tag">JavaScript</span>
+          <span class="skill-tag">SQL</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-name">AI / ML</div>
+        <div class="skill-tags">
+          <span class="skill-tag">PyTorch</span>
+          <span class="skill-tag">Transformers</span>
+          <span class="skill-tag">Fine-Tuning</span>
+          <span class="skill-tag">RLHF</span>
+          <span class="skill-tag">Prompt Engineering</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-name">Cybersecurity</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Nmap</span>
+          <span class="skill-tag">Metasploit</span>
+          <span class="skill-tag">Wireshark</span>
+          <span class="skill-tag">Kali Linux</span>
+          <span class="skill-tag">TCP/IP</span>
+          <span class="skill-tag">Pen Testing</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-cat-name">Tools</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Git / GitHub</span>
+          <span class="skill-tag">Postman</span>
+          <span class="skill-tag">Google Analytics</span>
+          <span class="skill-tag">Bash</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">Projects</div>
+  <h2 class="section-title">What I've Built</h2>
+  <div class="projects-grid">
+
+    <div class="project-card reveal">
+      <div class="project-num">01 / Featured</div>
+      <div class="project-name">LeoScore — Tennis Match Tracker</div>
+      <div class="project-desc">
+        Real-time tennis match tracking platform for Saint Leo University. Built with FastAPI on the backend, React on the front, Redis for low-latency caching, and role-based auth for coaches and players. Live in production since May 2025.
+      </div>
+      <div style="margin-bottom: 1.25rem;">
+        <div class="project-stat">180+</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Users · 3,000+ page views · 6,500+ events</div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">FastAPI</span>
+        <span class="project-tag">React</span>
+        <span class="project-tag">Redis</span>
+        <span class="project-tag">PostgreSQL</span>
+        <span class="project-tag">JWT Auth</span>
+        <span class="project-tag">REST API</span>
+      </div>
+      <a href="https://saint-leo-live-scores.onrender.com/" target="_blank" class="project-link">
+        Visit Live Site →
+      </a>
+    </div>
+
+    <div class="project-card reveal reveal-delay-1">
+      <div class="project-num">02 / AI</div>
+      <div class="project-name">TennisGPT — Domain-Specific AI</div>
+      <div class="project-desc">
+        Built a custom AI assistant for tennis strategy by designing data-collection pipelines, preprocessing match data from scratch, and fine-tuning transformer models. Evaluated performance using RLHF-style feedback loops with iterative experimentation.
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">PyTorch</span>
+        <span class="project-tag">Transformers</span>
+        <span class="project-tag">Fine-Tuning</span>
+        <span class="project-tag">RLHF</span>
+        <span class="project-tag">Data Pipelines</span>
+        <span class="project-tag">Python</span>
+      </div>
+      <a href="https://github.com/Educoheng1" target="_blank" class="project-link">
+        View on GitHub →
+      </a>
+    </div>
+
+    <div class="project-card reveal reveal-delay-2">
+      <div class="project-num">03 / Security</div>
+      <div class="project-name">Red Team Lab Environment</div>
+      <div class="project-desc">
+        Controlled penetration testing environment simulating real-world attack surfaces. Used Metasploit to test exploit vectors, analyzed packet traffic via Wireshark to observe authentication flows, and identified exposed SMB/HTTP services for assessment.
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">Metasploit</span>
+        <span class="project-tag">Wireshark</span>
+        <span class="project-tag">Nmap</span>
+        <span class="project-tag">Kali Linux</span>
+        <span class="project-tag">SMB / HTTP</span>
+        <span class="project-tag">Recon</span>
+      </div>
+      <span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);">Controlled Lab — Ongoing</span>
+    </div>
+
+    <div class="project-card reveal reveal-delay-3" style="background: linear-gradient(135deg, #f0f4ff, #f8f9fb); justify-content: center; align-items: flex-start; gap: 1rem;">
+      <div class="project-num">Open Source</div>
+      <div class="project-name">More on GitHub</div>
+      <div class="project-desc">
+        All personal projects, experiments, and open source contributions live on GitHub. From backend utilities to ML experiments — the full picture is there.
+      </div>
+      <a href="https://github.com/Educoheng1" target="_blank" class="btn-outline" style="font-size:0.8rem; margin-top: auto;">
+        github.com/Educoheng1 →
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">Experience</div>
+  <h2 class="section-title">Where I've Worked</h2>
+  <div class="timeline">
+    <div class="timeline-item reveal">
+      <div class="timeline-period">July 2025 — August 2025</div>
+      <div class="timeline-role">Business & Systems Intern</div>
+      <div class="timeline-company">RemoServ — Tel Aviv, Israel</div>
+      <ul class="timeline-points">
+        <li>Supported backend workflows across B2B ERP and e-commerce platforms serving U.S. hospitality clients</li>
+        <li>Debugged APIs and optimized data processing systems for large-scale platforms</li>
+        <li>Quickly adapted to proprietary software systems for troubleshooting, automation, and feature enhancements</li>
+      </ul>
+    </div>
+    <div class="timeline-item reveal reveal-delay-1">
+      <div class="timeline-period">May 2026 (Expected)</div>
+      <div class="timeline-role">B.S. Computer Science</div>
+      <div class="timeline-company">Saint Leo University — Saint Leo, FL</div>
+      <ul class="timeline-points">
+        <li>GPA: 3.5 / 4.0</li>
+        <li>Coursework in algorithms, networking, data structures, and systems</li>
+        <li>Built multiple production-grade projects alongside academic work</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ATHLETIC -->
+<section id="athletic">
+  <div class="athletic-banner"></div>
+  <div class="athletic-content">
+    <div class="section-label">Athletic</div>
+    <div class="athletic-grid">
+      <div>
+        <h2 class="section-title" style="margin-bottom:1.5rem;">Competitor.<br>Captain.</h2>
+        <div class="athletic-text reveal">
+          <p style="margin-bottom:1.25rem;">Before code, there was tennis. I've competed at the highest collegiate level since I arrived at Saint Leo University, and in 2025 I was named <strong style="color:var(--text)">Team Captain</strong>.</p>
+          <p style="margin-bottom:1.5rem;">The same discipline that gets me up for 6am practice is the same discipline I bring to engineering: consistency, pressure management, and obsessive preparation.</p>
+        </div>
+        <div class="reveal reveal-delay-1">
+          <span class="athletic-achievement"><span class="achievement-icon">★</span> #1 Doubles Player in the Country</span>
+          <span class="athletic-achievement"><span class="achievement-icon">★</span> NCAA 2024 Semifinalist</span>
+          <span class="athletic-achievement"><span class="achievement-icon">★</span> Team Captain — Saint Leo University</span>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div class="big-number">#1</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:0.5rem;">NCAA Doubles Ranking</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="section-label" style="justify-content:center;">Contact</div>
+    <h2 class="section-title reveal">Let's Build<br>Something.</h2>
+    <p class="contact-subtitle reveal reveal-delay-1">
+      Open to internships, full-time roles, and interesting side projects. 
+      Whether it's backend, security, or AI — reach out.
+    </p>
+    <div class="contact-links reveal reveal-delay-2">
+      <a href="mailto:educoheng@gmail.com" class="btn-primary">educoheng@gmail.com</a>
+      <a href="https://www.linkedin.com/in/educoheng/" target="_blank" class="btn-outline">LinkedIn</a>
+      <a href="https://github.com/Educoheng1" target="_blank" class="btn-outline">GitHub</a>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);" class="reveal reveal-delay-3">
+      Tampa, FL · (352) 769-1810
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>Eduardo Cohen © 2025</span>
+  <span>CS Senior · Developer · Athlete</span>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = (mouseX - 6) + 'px';
+    cursor.style.top = (mouseY - 6) + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX - 18) * 0.12;
+    ringY += (mouseY - ringY - 18) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.style.transform = 'scale(2)');
+    el.addEventListener('mouseleave', () => cursor.style.transform = 'scale(1)');
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
